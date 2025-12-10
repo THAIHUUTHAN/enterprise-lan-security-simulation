@@ -1,8 +1,10 @@
 # enterprise-lan-security-simulation
 Thiết kế mạng cho công ty vừa và nhỏ với mô hình lớp lõi thu gọn - Collapsed Core
-<img width="915" height="684" alt="image" src="https://github.com/user-attachments/assets/a0796391-88d7-4be7-9c4a-e14b0543dca5" />
+<img width="586" height="438" alt="image" src="https://github.com/user-attachments/assets/f88c8f7c-d3d5-4afb-a4ab-01508211f425" />
+
 Sơ đồ Logic của mô hình: 
-<img width="1048" height="545" alt="image" src="https://github.com/user-attachments/assets/9b705484-d327-4ebd-bd3b-780cb8f72841" />
+<img width="671" height="349" alt="image" src="https://github.com/user-attachments/assets/ee7a48a1-e7a2-45c6-8963-ff670d17a870" />
+
 Phân vùng (Zoning):
   INSIDE (Security 100): Mạng nội bộ tin cậy.
   OUTSIDE (Security 0): Mạng Internet không tin cậy.
