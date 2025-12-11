@@ -1,0 +1,15 @@
+enable
+configure terminal
+hostname R2
+interface Serial0/0/0
+ ip address 200.0.0.2 255.255.255.252
+ no shutdown
+exit
+interface Serial0/0/1
+ ip address 200.0.0.5 255.255.255.252
+ no shutdown
+exit
+ip route 0.0.0.0 0.0.0.0 200.0.0.6
+ip route 200.0.0.0 255.255.255.0 200.0.0.1
+end
+write
