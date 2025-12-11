@@ -1,0 +1,37 @@
+enable
+configure terminal
+hostname R1
+
+! --- Cấu hình cổng WAN nối ISP ---
+interface Serial0/0/0
+ description KET_NOI_ISP_R2
+ ip address 200.0.0.1 255.255.255.252
+ no shutdown
+exit
+
+! --- Cấu hình cổng LAN nối Firewall ---
+interface GigabitEthernet0/0
+ description KET_NOI_FIREWALL_ASA
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+exit
+
+! --- Định tuyến tĩnh ---
+! 1. Ra Internet (Default Route)
+ip route 0.0.0.0 0.0.0.0 200.0.0.2
+! 2. Vào mạng LAN (Về Firewall)
+ip route 192.168.0.0 255.255.0.0 10.0.0.2
+! 3. Vào Web/Mail Server (IP Public) - Quan trọng để nhận phản hồi từ Internet
+ip route 200.0.0.10 255.255.255.255 10.0.0.2
+ip route 200.0.0.11 255.255.255.255 10.0.0.2
+
+! --- Bảo mật quản trị SSH ---
+ip domain-name than.com
+crypto key generate rsa general-keys modulus 1024
+username admin privilege 15 secret Cisco123
+line vty 0 4
+ login local
+ transport input ssh
+exit
+end
+write
