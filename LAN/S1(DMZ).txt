@@ -1,0 +1,21 @@
+enable
+configure terminal
+hostname SW_DMZ
+vlan 2
+vlan 99
+exit
+! Uplink lên Firewall
+interface fa0/1
+ switchport mode access
+ switchport access vlan 2
+ no shutdown
+exit
+! Server Web & Mail
+interface range fa0/2, fa0/6
+ switchport mode access
+ switchport access vlan 2
+ spanning-tree portfast
+ no shutdown
+exit
+end
+write

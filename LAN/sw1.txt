@@ -1,0 +1,54 @@
+enable
+configure terminal
+! THAY HOSTNAME
+hostname SW_Marketing
+vlan 20
+vlan 99
+exit
+! Uplink
+interface range fa0/1-2
+ switchport mode trunk
+ switchport trunk native vlan 99
+ no shutdown
+exit
+! Wifi
+interface fa0/6
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ no shutdown
+exit
+! PC User (8-24)
+interface range fa0/8-24
+ description PC_USER
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ switchport port-security maximum 2
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+exit
+! Tắt cổng thừa (3-5, 7)
+interface range fa0/3-5, fa0/7
+ shutdown
+exit
+! Bảo mật DHCP & SSH
+ip dhcp snooping
+ip dhcp snooping vlan 20
+no ip dhcp snooping information option
+interface range fa0/1-2
+ ip dhcp snooping trust
+exit
+interface vlan 99
+ ip address 192.168.99.20 255.255.255.0
+ no shutdown
+ip default-gateway 192.168.99.254
+ip domain-name than.com
+crypto key generate rsa general-keys modulus 1024
+username admin privilege 15 secret Cisco123
+line vty 0 4
+ login local
+ transport input ssh
+exit
+end
+write

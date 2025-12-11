@@ -1,0 +1,113 @@
+enable
+configure terminal
+hostname MS2
+ip routing
+
+! --- 1. Tạo VLAN ---
+vlan 10
+ name KY_THUAT
+vlan 20
+ name MARKETING
+vlan 30
+ name KETOAN
+vlan 40
+ name KINH_DOANH
+vlan 50
+ name GIAM_DOC
+vlan 60
+ name IOT_CAM
+vlan 99
+ name MGMT
+exit
+
+! --- 2. Cấu hình Trunk ---
+interface range fa0/1-6
+ description TRUNK_LINK
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ no shutdown
+exit
+
+! --- 3. Uplink ASA ---
+interface g0/1
+ description UPLINK_ASA
+ no switchport
+ ip address 10.1.2.2 255.255.255.252
+ no shutdown
+exit
+
+! --- 4. STP Secondary ---
+spanning-tree mode rapid-pvst
+spanning-tree vlan 1-99 root secondary
+
+! --- 5. ACL Camera (Dự phòng) ---
+ip access-list extended BLOCK_IOT
+ permit ip 192.168.60.0 0.0.0.255 host 192.168.10.100
+ deny ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
+ permit ip any any
+exit
+
+! --- 6. HSRP Standby ---
+interface vlan 10
+ ip address 192.168.10.252 255.255.255.0
+ standby 10 ip 192.168.10.254
+ standby 10 priority 100
+ standby 10 preempt
+ no shutdown
+exit
+interface vlan 20
+ ip address 192.168.20.252 255.255.255.0
+ standby 20 ip 192.168.20.254
+ standby 20 priority 100
+ standby 20 preempt
+ no shutdown
+exit
+interface vlan 30
+ ip address 192.168.30.252 255.255.255.0
+ standby 30 ip 192.168.30.254
+ standby 30 priority 100
+ standby 30 preempt
+ no shutdown
+exit
+interface vlan 40
+ ip address 192.168.40.252 255.255.255.0
+ standby 40 ip 192.168.40.254
+ standby 40 priority 100
+ standby 40 preempt
+ no shutdown
+exit
+interface vlan 50
+ ip address 192.168.50.252 255.255.255.0
+ standby 50 ip 192.168.50.254
+ standby 50 priority 100
+ standby 50 preempt
+ no shutdown
+exit
+interface vlan 60
+ ip address 192.168.60.252 255.255.255.0
+ ip access-group BLOCK_IOT in
+ standby 60 ip 192.168.60.254
+ standby 60 priority 100
+ standby 60 preempt
+ no shutdown
+exit
+interface vlan 99
+ ip address 192.168.99.252 255.255.255.0
+ standby 99 ip 192.168.99.254
+ standby 99 priority 100
+ standby 99 preempt
+ no shutdown
+exit
+
+! --- 7. Routing & SSH ---
+ip route 0.0.0.0 0.0.0.0 10.1.2.1
+ip domain-name than.com
+crypto key generate rsa general-keys modulus 1024
+username admin privilege 15 secret Cisco123
+line vty 0 4
+ login local
+ transport input ssh
+exit
+end
+write

@@ -1,0 +1,31 @@
+A.Vùng Internet(vùng ngoài-5 thiết bị):
+1.Router R2: nối với router R1 ở trong vùng root(mạng nội bộ) qua cổng se0/0/0, nối với router R2 trong vùng này qua se0/0/1
+2.Router R3: nối với router R2 qua cổng se0/0/1
+nối xuống Switch S3 qua cồng g0/0
+3.Switch S3: nối với router R3 qua cổng fa3/0, nối với Server-PT(Google) qua cổng fa0/1, nối với PC-PT(khach hang) qua cổng fa0/2
+4.Server_PT(Google): giả lập internet , nối với Switch S3 qua cổng fa0
+5.PC-PT(khach hang): giải lập khách hàng truy cập từ ngoài vào web của công ty, nối với switch qua cổng: fa0
+
+B.Vùng root(mạng nội bộ công ty):
+
+Lớp Biên:
+1.Router R1: nối ra internet qua se0/0/0, nối với tường lửa 5506-X(ASA0) qua g0/0
+2.Tường lửa 5506-X(ASA0): nối với R1 qua g1/4, nối với Switch S1 trong DMZ qua g1/1, nối với CoreSwitch MS1(bên trái) qua g1/3, kết nối với CoreSwitch MS2(bên phải, gần DMZ) qua g1/2
+
+Lớp lõi:
+1.CoreSwitch MS1: nối với tường lửa ASA0 qua g0/1, nối với Switch 0(phòng Kỹ Thuật) qua fa0/1, với Switch 1(phòng Marketing) qua fa0/2, với Switch 2(phòng Ketoan) qua fa0/3, với Switch 3(phòng Kinhdoanh) qua fa0/4,với Switch 4(phòng Giamdoc) qua fa0/5, nối với MS2 qua fa0/6
+2. CoreSwitch MS2: nối với tường lửa ASA0 qua g0/1, nối với Switch 0(phòng Kỹ Thuật) qua fa0/1, với Switch 1(phòng Marketing) qua fa0/2, với Switch 2(phòng Ketoan) qua fa0/3, với Switch 3(phòng Kinhdoanh) qua fa0/4,với Switch 4(phòng Giamdoc) qua fa0/5, nối với MS1 qua fa0/6
+
+Lớp truy cập:
+1.Switch(0 đến 4): các Switch này nối đến MS1 bằng fa0/1, đến MS2 bằng fa0/2, nối đến Accesspoint bằng fa0/6,nối đến các pc qua cổng tùy chỉnh(hãy viết trong câu lệnh là x để tôi tự thay thế) đặc biệt có các trường hợp đặc biệt như:
+ 1.1.Phòng Kythuat có Server AAT/IOT nối với switch 0 qua fa0, switch nối qua AAT/IOT qua fa0/10
+ 1.2.Phòng Ketoan có máy in nối với Switch qua cổng 0, Sưitch nối qua máy in qua cổng fa0/7
+ngoài ra các cấu hình ở các phòng đều như mô tả bên trên 
+
+Vùng DMZ:
+1.Switch S1 : nối với server WEB/DNS qua fa0/6, nối với Server Mail qua fa0/2
+2.WEB/DNS server: máy chủ web cho khách hàng và người dùng nội bộ truy cập, nối với S1 qua fa0
+3.Mail server: máy chủ  cho khách hàng và người dùng nội bộ truy cập, nối với S1 qua fa0
+
+ngoài ra mỗi phòng đều có camera kết nối với wifi của phòng đó
+

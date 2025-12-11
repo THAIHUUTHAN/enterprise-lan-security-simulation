@@ -1,0 +1,72 @@
+enable
+configure terminal
+hostname ASA0
+
+! --- Cấu hình Interface & Vùng bảo mật ---
+interface g1/4
+ nameif OUTSIDE
+ security-level 0
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+exit
+
+interface g1/1
+ nameif DMZ
+ security-level 50
+ ip address 192.168.2.254 255.255.255.0
+ no shutdown
+exit
+
+interface g1/3
+ nameif INSIDE1
+ security-level 100
+ ip address 10.1.1.1 255.255.255.252
+ no shutdown
+exit
+
+interface g1/2
+ nameif INSIDE2
+ security-level 100
+ ip address 10.1.2.1 255.255.255.252
+ no shutdown
+exit
+
+! --- Định tuyến ---
+route OUTSIDE 0.0.0.0 0.0.0.0 10.0.0.1
+route INSIDE1 192.168.0.0 255.255.0.0 10.1.1.2 1
+route INSIDE2 192.168.0.0 255.255.0.0 10.1.2.2 2
+
+! --- Chính sách truy cập (ACL) ---
+! Cho phép Internet truy cập Web (80), Mail (25, 110) và Ping
+access-list OUT_TO_DMZ extended permit tcp any host 192.168.2.10 eq 80
+access-list OUT_TO_DMZ extended permit tcp any host 192.168.2.11 eq 25
+access-list OUT_TO_DMZ extended permit tcp any host 192.168.2.11 eq 110
+access-list OUT_TO_DMZ extended permit icmp any host 192.168.2.10
+access-list OUT_TO_DMZ extended permit icmp any host 192.168.2.11
+access-group OUT_TO_DMZ in interface OUTSIDE
+
+! Cho phép DMZ ra ngoài
+access-list DMZ_OUT extended permit ip any any
+access-group DMZ_OUT in interface DMZ
+
+! Cho phép Ping xuyên tường lửa
+policy-map global_policy
+ class inspection_default
+  inspect icmp
+exit
+
+! --- NAT ---
+object network LAN_NAT
+ subnet 192.168.0.0 255.255.0.0
+ nat (any,OUTSIDE) dynamic interface
+
+object network WEB_SRV
+ host 192.168.2.10
+ nat (DMZ,OUTSIDE) static 200.0.0.10
+
+object network MAIL_SRV
+ host 192.168.2.11
+ nat (DMZ,OUTSIDE) static 200.0.0.11
+
+end
+write

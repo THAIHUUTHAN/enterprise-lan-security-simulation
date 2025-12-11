@@ -1,0 +1,145 @@
+enable
+configure terminal
+hostname MS1
+ip routing
+
+! --- 1. Tạo VLAN ---
+vlan 10
+ name KY_THUAT
+vlan 20
+ name MARKETING
+vlan 30
+ name KETOAN
+vlan 40
+ name KINH_DOANH
+vlan 50
+ name GIAM_DOC
+vlan 60
+ name IOT_CAM
+vlan 99
+ name MGMT
+exit
+
+! --- 2. Cấu hình Trunking ---
+interface range fa0/1-6
+ description TRUNK_LINK
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk native vlan 99
+ no shutdown
+exit
+
+! --- 3. Uplink Layer 3 lên Firewall ---
+interface g0/1
+ description UPLINK_ASA
+ no switchport
+ ip address 10.1.1.2 255.255.255.252
+ no shutdown
+exit
+
+! --- 4. STP Root Primary ---
+spanning-tree mode rapid-pvst
+spanning-tree vlan 1-99 root primary
+
+! --- 5. ACL Chặn Camera IoT ---
+ip access-list extended BLOCK_IOT
+ permit ip 192.168.60.0 0.0.0.255 host 192.168.10.100
+ deny ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
+ permit ip any any
+exit
+
+! --- 6. HSRP Active ---
+interface vlan 10
+ ip address 192.168.10.251 255.255.255.0
+ standby 10 ip 192.168.10.254
+ standby 10 priority 150
+ standby 10 preempt
+ no shutdown
+exit
+interface vlan 20
+ ip address 192.168.20.251 255.255.255.0
+ standby 20 ip 192.168.20.254
+ standby 20 priority 150
+ standby 20 preempt
+ no shutdown
+exit
+interface vlan 30
+ ip address 192.168.30.251 255.255.255.0
+ standby 30 ip 192.168.30.254
+ standby 30 priority 150
+ standby 30 preempt
+ no shutdown
+exit
+interface vlan 40
+ ip address 192.168.40.251 255.255.255.0
+ standby 40 ip 192.168.40.254
+ standby 40 priority 150
+ standby 40 preempt
+ no shutdown
+exit
+interface vlan 50
+ ip address 192.168.50.251 255.255.255.0
+ standby 50 ip 192.168.50.254
+ standby 50 priority 150
+ standby 50 preempt
+ no shutdown
+exit
+interface vlan 60
+ ip address 192.168.60.251 255.255.255.0
+ ip access-group BLOCK_IOT in
+ standby 60 ip 192.168.60.254
+ standby 60 priority 150
+ standby 60 preempt
+ no shutdown
+exit
+interface vlan 99
+ ip address 192.168.99.251 255.255.255.0
+ standby 99 ip 192.168.99.254
+ standby 99 priority 150
+ standby 99 preempt
+ no shutdown
+exit
+
+! --- 7. DHCP Server ---
+ip dhcp pool VLAN10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.254
+ dns-server 192.168.2.10
+exit
+ip dhcp pool VLAN20
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.254
+ dns-server 192.168.2.10
+exit
+ip dhcp pool VLAN30
+ network 192.168.30.0 255.255.255.0
+ default-router 192.168.30.254
+ dns-server 192.168.2.10
+exit
+ip dhcp pool VLAN40
+ network 192.168.40.0 255.255.255.0
+ default-router 192.168.40.254
+ dns-server 192.168.2.10
+exit
+ip dhcp pool VLAN50
+ network 192.168.50.0 255.255.255.0
+ default-router 192.168.50.254
+ dns-server 192.168.2.10
+exit
+ip dhcp pool VLAN60
+ network 192.168.60.0 255.255.255.0
+ default-router 192.168.60.254
+ dns-server 192.168.2.10
+exit
+
+! --- 8. Routing & SSH ---
+ip route 0.0.0.0 0.0.0.0 10.1.1.1
+ip domain-name than.com
+crypto key generate rsa general-keys modulus 1024
+username admin privilege 15 secret Cisco123
+line vty 0 4
+ login local
+ transport input ssh
+exit
+end
+write

