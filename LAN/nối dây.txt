@@ -17,7 +17,7 @@ Lớp lõi:
 2. CoreSwitch MS2: nối với tường lửa ASA0 qua g0/1, nối với Switch 0(phòng Kỹ Thuật) qua fa0/1, với Switch 1(phòng Marketing) qua fa0/2, với Switch 2(phòng Ketoan) qua fa0/3, với Switch 3(phòng Kinhdoanh) qua fa0/4,với Switch 4(phòng Giamdoc) qua fa0/5, nối với MS1 qua fa0/6
 
 Lớp truy cập:
-1.Switch(0 đến 4): các Switch này nối đến MS1 bằng fa0/1, đến MS2 bằng fa0/2, nối đến Accesspoint bằng fa0/6,nối đến các pc qua cổng tùy chỉnh(hãy viết trong câu lệnh là x để tôi tự thay thế) đặc biệt có các trường hợp đặc biệt như:
+1.Switch(0 đến 4): các Switch này nối đến MS1 bằng fa0/1, đến MS2 bằng fa0/2, nối đến Accesspoint bằng fa0/6,nối đến các pc qua cổng tùy chỉnh(8-24 hoặc 11-24 tùy vùng) đặc biệt có các trường hợp đặc biệt như:
  1.1.Phòng Kythuat có Server AAT/IOT nối với switch 0 qua fa0, switch nối qua AAT/IOT qua fa0/10
  1.2.Phòng Ketoan có máy in nối với Switch qua cổng 0, Sưitch nối qua máy in qua cổng fa0/7
 ngoài ra các cấu hình ở các phòng đều như mô tả bên trên 
@@ -28,4 +28,5 @@ Vùng DMZ:
 3.Mail server: máy chủ  cho khách hàng và người dùng nội bộ truy cập, nối với S1 qua fa0
 
 ngoài ra mỗi phòng đều có camera kết nối với wifi của phòng đó
+
 
